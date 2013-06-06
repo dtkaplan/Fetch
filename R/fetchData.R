@@ -4,13 +4,13 @@
 #' locate and load data sets and R commands provided by instructors.  
 #' Data can be pre-loaded for off-line sessions, can be positioned 
 #' on identified web sites, or loaded from packages.  
-#' \code{fetchData} also will load local files using a complete path name (relative
-#' to the current working directory) or, if no name is given, via a dialog box.
-#'
-#' @param name a character string naming a data set.  
+#' \code{fetchData} also will load local files using a complete path name (relative 
+#' to the current working directory) or, if no name is given, via a dialog box. 
+#' 
+#' @param name a character string naming a data set. 
 #'    This will often end in \code{.csv} for reading in a data set. 
-#'    If it ends in \code{.r} or \code{.R}, the file will be "sourced".
-#' @param show.path If \code{TRUE}, causes the current search path to be returned
+#'    If it ends in \code{.r} or \code{.R}, the file will be "sourced". 
+#' @param show.path If \code{TRUE}, causes the current search path to be returned 
 #' @param add.to.path Name of a web directory (ending in \code{/}), which 
 #' should be pre-pended to the search path.
 #'   
