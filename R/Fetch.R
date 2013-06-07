@@ -268,13 +268,12 @@ fetchDat <- function(name,pkg = NULL){
 .getText <- function(name){
   if (suppressWarnings((require(RCurl,quietly=TRUE)))){
     if (url.exists(name)){
-      s <- getURLContent(name)
-      if (attributes(x)$`Content-Type` == "text/html") name <- getURL(name)
-      else name <- textConnection(s)
+      s <- getBinaryURL(name)
+      name <- rawConnection(s)
     }
   }
   else name <- url(name)
-  res <- try( suppressWarnings(readChar( name , 10^9)), silent=TRUE )
+  res <- try( suppressWarnings(readChar( name , 10^6)), silent=TRUE )
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(res)
 }
