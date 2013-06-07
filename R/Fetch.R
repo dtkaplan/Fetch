@@ -1,3 +1,32 @@
+#' An easy way for students to load data sets, source r files, and load r workspaces
+#'
+#' Description of \code{fetch}
+#'
+#' @param name a character string naming a data set.
+#' This will often end in \code{.csv} for reading in a data set.
+#' If it ends in \code{.r} or \code{.R}, the file will be "sourced".
+#' An extension is not required, however.
+#' If no name is specified the user file.choose() interface will be opened for the
+#' user to choose his/her file.
+#' @param onlineDir a character string specifying a website. 
+#' \code{fetch} will search for the file on this website.
+#'
+#' @details
+#' details go here
+#'
+#' @return a data frame.
+#'
+#' @export
+#' @examples
+#' \dontrun{dome <- fetchData("Dome.csv")}
+#' \dontrun{carbon <- fetchData("CO2")}
+#' \dontrun{fetchData(show=TRUE)}
+#' \dontrun{fetchData(add.to.path="http://www.macalester.edu/~kaplan/ISM/datasets/")}
+#' \dontrun{fetchData(drop.from.path="http://www.macalester.edu/~kaplan/ISM/datasets/") }
+#' \dontrun{dome <- fetchData("Dome.csv", cache=TRUE)}
+#' @keywords util
+#' 
+
 fetch <- function(name = NULL,onlineDir = "http://www.mosaic-web.org/go/datasets/"){
   if(is.null(name)){
     fname = file.choose()
@@ -27,36 +56,36 @@ fetch <- function(name = NULL,onlineDir = "http://www.mosaic-web.org/go/datasets
   ext <- tolower(last[l])
   
   ##look online
-  if(l == 1) res <- fetchOnline(name,onlineDir)
-  else res <- fetchOnline(name,onlineDir,ext)
+  if(l == 1) res <- .fetchOnline(name,onlineDir)
+  else res <- .fetchOnline(name,onlineDir,ext)
   if(!is.null(res)){
     if(!is.logical(res)) return(res)
-    else invisible(res)
+    else return(invisible(res))
   }
   
-  ##look using remoteFetch
-  oDir <- remoteFetch(name)
+  ##look using .remoteFetch
+  oDir <- .remoteFetch(name)
   if (!is.null(oDir)){
-    if(l == 1) res <- fetchOnline(base,oDir)
-    else res <- fetchOnline(base,oDir,ext)
+    if(l == 1) res <- .fetchOnline(base,oDir)
+    else res <- .fetchOnline(base,oDir,ext)
     if(!is.null(res)){
       if(!is.logical(res)) return(res)
-      else invisible(res)
+      else return(invisible(res))
     }
   }
   
   ##look in cwd
   switch(ext,
          "csv" = {res <- .read.csv(name)},
-         "r" = {.source.file(path); if(!is.null(res)) message("File successfully sourced")},
-         "rda" = {.loadWorkspace(url(path)); if(!is.null(res)) message("Workspace successfully loaded")},
-         "rdata" = {.loadWorkspace(url(path)); if(!is.null(res)) message("Workspace successfully loaded")},
-         "rmd" = {res <- .getText(url(path))},
-         "html" = {res <- .getText(url(path))},
+         "r" = {res <- .source.file(path); if(!is.null(res)) message("File successfully sourced")},
+         "rda" = {res <- .loadWorkspace(path); if(!is.null(res)) message("Workspace successfully loaded")},
+         "rdata" = {res <- .loadWorkspace(path); if(!is.null(res)) message("Workspace successfully loaded")},
+         "rmd" = {res <- .getText(path)},
+         "html" = {res <- .getText(path)},
 {stop("File extension not compatible. Please use one of the following file extensions: \n .csv, .r, .rda, .rdata, .rmd, .html")})
   if(!is.null(res)){
     if(!is.logical(res)) return(res)
-    else invisible(res)
+    else return(invisible(res))
   }
   else stop("No file found.")
 }
@@ -95,16 +124,16 @@ fetchDat <- function(name,pkg = NULL){
   return(NULL)
 }
 
-fetchOnline <- function(name,onlineDir,ext=NULL){
+.fetchOnline <- function(name,onlineDir,ext=NULL){
   if (!is.null(ext)){
     path <- paste(onlineDir,name,sep="")
     switch(ext,
            "csv" = {res <- .read.csv(path); return(res)},
-           "r" = {.source.file(path); if(!is.null(res)) {message("File successfully sourced"); return(res)}},
-           "rda" = {.loadWorkspace(url(path)); if(!is.null(res)) {message("Workspace successfully loaded"); return(res)}},
-           "rdata" = {.loadWorkspace(url(path)); if(!is.null(res)) {message("Workspace successfully loaded"); return(res)}},
-           "rmd" = {res <- .getText(url(path)); return(res)},
-           "html" = {res <- .getText(url(path)); return(res)},
+           "r" = {res <- .source.file(path); if(!is.null(res)) {message("File successfully sourced"); return(res)}},
+           "rda" = {res <- .loadWorkspace(path); if(!is.null(res)) {message("Workspace successfully loaded"); return(res)}},
+           "rdata" = {res <- .loadWorkspace(path); if(!is.null(res)) {message("Workspace successfully loaded"); return(res)}},
+           "rmd" = {res <- .getText(path); return(res)},
+           "html" = {res <- .getText(path); return(res)},
 {stop("File extension not compatible. Please use one of the following file extensions: \n .csv, .r, .rda, .rdata, .rmd, .html")})
   }
   else{
@@ -121,14 +150,14 @@ fetchOnline <- function(name,onlineDir,ext=NULL){
     }
     ##look for .rda file
     path <- paste(onlineDir,name,'.rda',sep="")
-    res <- .loadWorkspace(url(path))
+    res <- .loadWorkspace(path)
     if(!is.null(res)){
       message("Workspace successfully loaded")
       return(TRUE)
     }
     ##look for .rdata file
     path <- paste(onlineDir,name,'.rdata',sep="")
-    res <- .loadWorkspace(url(path))
+    res <- .loadWorkspace(path)
     if(!is.null(res)){
       message("Workspace successfully loaded")
       return(TRUE)
@@ -146,40 +175,40 @@ fetchOnline <- function(name,onlineDir,ext=NULL){
     }
     ##look for .RDA file
     path <- paste(onlineDir,name,'.RDA',sep="")
-    res <- .loadWorkspace(url(path))
+    res <- .loadWorkspace(path)
     if(!is.null(res)){
       message("Workspace successfully loaded")
       return(TRUE)
     }
     ##look for .Rdata file
     path <- paste(onlineDir,name,'.Rdata',sep="")
-    res <- .loadWorkspace(url(path))
+    res <- .loadWorkspace(path)
     if(!is.null(res)){
       message("Workspace successfully loaded")
       return(TRUE)
     }
     ##look for .Rmd file
     path <- paste(onlineDir,name,'.Rmd',sep="")
-    res <- .getText(url(path))
+    res <- .getText(path)
     if(!is.null(res)) return(res)
     ##look for .rmd file
     path <- paste(onlineDir,name,'.rmd',sep="")
-    res <- .getText(url(path))
+    res <- .getText(path)
     if(!is.null(res)) return(res)
     ##look for .RMD file
     path <- paste(onlineDir,name,'.RMD',sep="")
-    res <- .getText(url(path))
+    res <- .getText(path)
     if(!is.null(res)) return(res)
     ##look for .html file
     path <- paste(onlineDir,name,'.html',sep="")
-    res <- .getText(url(path))
+    res <- .getText(path)
     if(!is.null(res)) return(res)
     ##no file found
     return(NULL)
   }
 }
 
-remoteFetch <- function(fname){
+.remoteFetch <- function(fname){
   rootName <- 'http://www.mosaic-web.org/go/Redirects/mosaic-fetch-redirect.csv'
   components <- strsplit(fname,'/',fixed=TRUE)
   who <- components[[1]][1] # which redirect site
@@ -213,7 +242,10 @@ remoteFetch <- function(fname){
 
 .source.file <- function(name){
   if (suppressWarnings((require(RCurl,quietly=TRUE)))){
-    if (url.exists(name)) name <- getURLContent(name)
+    if (url.exists(name)){
+      s <- getURL(name)
+      name <- textConnection(s)
+    } 
   }
   res <- try( suppressWarnings(source( name )), silent=TRUE )
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
@@ -223,10 +255,11 @@ remoteFetch <- function(fname){
 .loadWorkspace <- function(name){
   if (suppressWarnings((require(RCurl,quietly=TRUE)))){
     if (url.exists(name)){
-      s <- getURLContent(name)
-      name <- textConnection(s)
+      s <- getBinaryURL(name)
+      name <- rawConnection(s)
     }
   }
+  else name <- url(name)
   res <- try( suppressWarnings(load( name , envir = .GlobalEnv)), silent=TRUE ) 
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(TRUE)
@@ -240,6 +273,7 @@ remoteFetch <- function(fname){
       else name <- textConnection(s)
     }
   }
+  else name <- url(name)
   res <- try( suppressWarnings(readChar( name , 10^9)), silent=TRUE )
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(res)
