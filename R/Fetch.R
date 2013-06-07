@@ -43,14 +43,12 @@ fetch <- function(name = NULL,onlineDir = "http://www.mosaic-web.org/go/datasets
 {stop("File extension not compatible. Please use one of the following file extensions: \n .csv, .r, .rda, .rdata, .rmd")})
   }
   first <- strsplit(name,'/',fixed=TRUE)[[1]][1]
+  base <- basename(name)
   packages <- c("mosaic","Fetch")
-  
   ##look in packages
-  if (first %in% packages) res <- fetchDat(name,first)
+  if (first %in% packages) res <- fetchDat(base,first)
   else res <- fetchDat(name)
   if(!is.null(res)) return(res)
-  
-  base <- basename(name)
   last <- strsplit(base,'.',fixed=TRUE)[[1]]
   l <- length(last)
   ext <- tolower(last[l])
@@ -94,13 +92,13 @@ fetchDat <- function(name,pkg = NULL){
   if (is.null(pkg)){
     ##look in mosaic package
     newEnv = new.env()
-    res <- try( suppressWarnings(data(name,package="mosaic", envir = newEnv)), silent=TRUE )
+    try( suppressWarnings(data(list = name,package="mosaic", envir = newEnv)), silent=TRUE )
     if(length(ls(envir=newEnv)) > 0){
       data <- get(name,envir=newEnv)
       return(data)
     } 
     ##look in Fetch package
-    res <- try( suppressWarnings(data(name,package="Fetch", envir = newEnv)), silent=TRUE )
+    try( suppressWarnings(data(list = name,package="Fetch", envir = newEnv)), silent=TRUE )
     if(length(ls(envir=newEnv)) > 0){
       data <- get(name,envir=newEnv)
       return(data)
@@ -109,7 +107,7 @@ fetchDat <- function(name,pkg = NULL){
   else{
     ##look in specified package
     newEnv = new.env()
-    res <- try( suppressWarnings(data(name,package=pkg, envir = newEnv)), silent=TRUE )
+    res <- try( suppressWarnings(data(list = name,package=pkg, envir = newEnv)), silent=TRUE )
     if(length(ls(envir=newEnv)) > 0){
       data <- get(name,envir=newEnv)
       return(data)
