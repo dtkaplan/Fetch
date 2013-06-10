@@ -263,7 +263,6 @@ fetchDat <- function(name,pkg = NULL){
   else return(TRUE)
 }
 
-####  Change
 .getText <- function(name){
   if (suppressWarnings((require(RCurl,quietly=TRUE)))){
     if (url.exists(name)){
