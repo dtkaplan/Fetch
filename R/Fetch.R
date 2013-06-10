@@ -234,6 +234,7 @@ fetchDat <- function(name,pkg = NULL){
     }
   }
   res <- try( suppressWarnings(read.csv( name )), silent=TRUE )
+  try(suppressWarnings(close(name)), silent=TRUE)
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(res)
 }
@@ -246,6 +247,7 @@ fetchDat <- function(name,pkg = NULL){
     } 
   }
   res <- try( suppressWarnings(source( name )), silent=TRUE )
+  try(suppressWarnings(close(name)), silent=TRUE)
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(TRUE)
 }
@@ -259,6 +261,7 @@ fetchDat <- function(name,pkg = NULL){
   }
   else name <- url(name)
   res <- try( suppressWarnings(load( name , envir = .GlobalEnv)), silent=TRUE ) 
+  try( suppressWarnings(close(name)),silent=TRUE)
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(TRUE)
 }
@@ -272,6 +275,7 @@ fetchDat <- function(name,pkg = NULL){
   }
   else name <- url(name)
   res <- try( suppressWarnings(readChar( name , 10^6)), silent=TRUE )
+  try(suppressWarnings(close(name)), silent=TRUE)
   if( is.null(res) | class(res)=="try-error" ) return(NULL)
   else return(res)
 }
